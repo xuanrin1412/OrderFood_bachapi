@@ -1,17 +1,15 @@
 import USFflag from "../assets/USFlag.png"
 import { IoChevronDown } from "react-icons/io5";
 import { LuLock } from "react-icons/lu";
-import { LuEyeOff } from "react-icons/lu";
-import { LuEye } from "react-icons/lu";
 import SideTheme from "../components/SideTheme";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { setBlur, setFocus, togglePassword } from "../features/FormAuth/formAuthSlice";
+import { setBlur, setFocus } from "../features/FormAuth/formAuthSlice";
 import { useState } from "react";
 // import { FiUser } from "react-icons/fi";
 import { toast } from 'react-toastify';
-import { IoCode } from "react-icons/io5";
+// import { IoCode } from "react-icons/io5";
 // import Cookies from 'js-cookie';
 import axios from "../api/axios";
 import { HiOutlineMail } from "react-icons/hi";
@@ -24,21 +22,21 @@ export default function ChangePassword() {
         dispatch(setFocus(inputName))
     };
     const focusedInput: string = useSelector((state: RootState) => state.forms.focusedInput);
-    const showPassword: boolean = useSelector((state: RootState) => state.forms.showPassword);
-    const handleTogglePassword = () => {
-        dispatch(togglePassword())
-    };
+    // const showPassword: boolean = useSelector((state: RootState) => state.forms.showPassword);
+    // const handleTogglePassword = () => {
+    //     dispatch(togglePassword())
+    // };
+
     const [email, setEmail] = useState<string>("")
-    const [password, setPassword] = useState<string>("")
-    const [code, setCode] = useState<string>("")
+    const [oldPassword, setOldPassword] = useState<string>("")
+    const [newPassword, setNewPassword] = useState<string>("")
+    const [confirmPassword, setConfirmPassword] = useState<string>("")
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault()
-        console.log(email, password, code);
+        console.log(email, oldPassword, newPassword, confirmPassword);
         await axios.put("/api/v1/auth/change-password", {
-            email,
-            password,
-            code
+            email, oldPassword, newPassword, confirmPassword
         })
             .then((res) => {
                 console.log("res change pass", res);
@@ -78,20 +76,31 @@ export default function ChangePassword() {
                             <HiOutlineMail style={{ height: 24, width: 24, marginLeft: 16, marginRight: 12, color: "#96A0B5" }} />
                             <input value={email} onChange={e => setEmail(e.target.value)} type="email" required placeholder="Email" className="stylePlaceholder flex-1 mr-[2.688rem] outline-none text-base leading-nomalText font-medium tracking-nomalText  text-textInput dark:text-white bg-white dark:bg-[#292C38] " />
                         </span>
-                        <span onFocus={() => handleInputFocus('password')}
+                        <span onFocus={() => handleInputFocus('oldPassword')}
                             onBlur={() => dispatch(setBlur())}
-                            className={`${focusedInput === 'password' ? ' border-third' : 'border-borderColor dark:border-[#565C70]'} h-58 flex items-center pt-[1.188rem] pb-[1.125rem] rounded-xl border  `}>
+                            className={`${focusedInput === 'oldPassword' ? ' border-third' : 'border-borderColor dark:border-[#565C70]'} h-58 flex items-center pt-[1.188rem] pb-[1.125rem] rounded-xl border  `}>
                             <LuLock style={{ height: 24, width: 24, marginLeft: 16, marginRight: 12, color: "#96A0B5" }} />
-                            <input value={password} onChange={e => setPassword(e.target.value)} type="password" required placeholder="Password" className="password stylePlaceholder flex-1 outline-none text-base leading-nomalText font-medium tracking-nomalText  text-textInput dark:text-white bg-white dark:bg-[#292C38]" />
-                            {showPassword ? <LuEye onClick={handleTogglePassword} style={{ height: 24, width: 24, color: "#96A0B5", margin: " 0 16px" }} /> :
-                                <LuEyeOff onClick={handleTogglePassword} style={{ height: 24, width: 24, color: "#96A0B5", margin: " 0 16px" }} />}
+                            <input value={oldPassword} onChange={e => setOldPassword(e.target.value)} type="text" required placeholder="Old Password" className="password stylePlaceholder flex-1 outline-none text-base leading-nomalText font-medium tracking-nomalText  text-textInput dark:text-white bg-white dark:bg-[#292C38]" />
                         </span>
-                        <span onFocus={() => handleInputFocus("code")}
+                        <span onFocus={() => handleInputFocus('newPassword')}
                             onBlur={() => dispatch(setBlur())}
-                            className={`${focusedInput === 'code' ? ' border-third' : 'border-borderColor dark:border-[#565C70]'} h-58 flex items-center pt-[1.188rem] pb-[1.125rem] rounded-xl border  `}>
-                            <IoCode style={{ height: 24, width: 24, marginLeft: 16, marginRight: 12, color: "#96A0B5" }} />
-                            <input value={code} onChange={e => setCode(e.target.value)} type="text" required placeholder="Code" className="stylePlaceholder flex-1 mr-[2.688rem] outline-none text-base leading-nomalText font-medium tracking-nomalText  text-textInput dark:text-white bg-white dark:bg-[#292C38] " />
+                            className={`${focusedInput === 'newPassword' ? ' border-third' : 'border-borderColor dark:border-[#565C70]'} h-58 flex items-center pt-[1.188rem] pb-[1.125rem] rounded-xl border  `}>
+                            <LuLock style={{ height: 24, width: 24, marginLeft: 16, marginRight: 12, color: "#96A0B5" }} />
+                            <input value={newPassword} onChange={e => setNewPassword(e.target.value)} type="text" required placeholder="New Password" className="password stylePlaceholder flex-1 outline-none text-base leading-nomalText font-medium tracking-nomalText  text-textInput dark:text-white bg-white dark:bg-[#292C38]" />
+                            {/* {showPassword ? <LuEye onClick={handleTogglePassword} style={{ height: 24, width: 24, color: "#96A0B5", margin: " 0 16px" }} /> :
+                                <LuEyeOff onClick={handleTogglePassword} style={{ height: 24, width: 24, color: "#96A0B5", margin: " 0 16px" }} />} */}
                         </span>
+
+                        <span onFocus={() => handleInputFocus('confirmPassword')}
+                            onBlur={() => dispatch(setBlur())}
+                            className={`${focusedInput === 'confirmPassword' ? ' border-third' : 'border-borderColor dark:border-[#565C70]'} h-58 flex items-center pt-[1.188rem] pb-[1.125rem] rounded-xl border  `}>
+                            <LuLock style={{ height: 24, width: 24, marginLeft: 16, marginRight: 12, color: "#96A0B5" }} />
+                            <input value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} type="text" required placeholder="Confirm Password" className="password stylePlaceholder flex-1 outline-none text-base leading-nomalText font-medium tracking-nomalText  text-textInput dark:text-white bg-white dark:bg-[#292C38]" />
+                            {/* {showPassword ? <LuEye onClick={handleTogglePassword} style={{ height: 24, width: 24, color: "#96A0B5", margin: " 0 16px" }} /> :
+                                <LuEyeOff onClick={handleTogglePassword} style={{ height: 24, width: 24, color: "#96A0B5", margin: " 0 16px" }} />} */}
+                        </span>
+
+
 
                     </div>
                     <div className="flex items-center justify-between custom-checkbox">
