@@ -35,7 +35,7 @@ export default function ChangePassword() {
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault()
         console.log(email, password, code);
-        await axios.put("/api/change-password", {
+        await axios.put("/api/v1/auth/change-password", {
             email,
             password,
             code

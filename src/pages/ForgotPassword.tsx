@@ -24,7 +24,7 @@ export default function ForgotPassword() {
     };
     const handleCheckEmail = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await axios.post("/api/forgot-password", {
+        await axios.post("/api/v1/auth/forgot-password", {
             email
         })
             .then((res) => {
