@@ -5,10 +5,6 @@ import { HiOutlineMail } from "react-icons/hi";
 import { LuEye, LuLock } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import { FcGoogle } from "react-icons/fc";
-// import { MdDriveFileRenameOutline } from "react-icons/md";
-// import { MdOutlineTransgender } from "react-icons/md";
-// import { FaBirthdayCake } from "react-icons/fa";
-// import { FaLocationDot } from "react-icons/fa6";
 import SideTheme from "../components/SideTheme";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,10 +31,6 @@ export default function Register() {
     const [email, setEmail] = useState<string>("")
     const [userName, setUserName] = useState<string>("")
     const [password, setPassword] = useState<string>("")
-    // const [fullName, setFullName] = useState<string>("")
-    // const [address, setAddress] = useState<string>("")
-    // const [gender, setGender] = useState<string>("")
-    // const [dob, setDob] = useState<string>("")
 
     const [checkPassword, setCheckPassword] = useState<boolean>(false)
     // const score = document.querySelector('.custom-passwordStrength > p');
@@ -61,18 +53,12 @@ export default function Register() {
                 userName,
                 email,
                 password,
-                // fullName,
-                // address,
-                // gender,
-                // dob
             },)
                 .then((res) => {
                     console.log(res);
                     return navigate("/login")
                 })
                 .catch(err => {
-                    console.log(err);
-
                     console.log("err", err.response.data.message);
                     toast.error(<p className=" capitalize">{err.response.data.message}</p>)
                 })

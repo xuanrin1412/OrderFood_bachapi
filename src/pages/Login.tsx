@@ -14,7 +14,6 @@ import { FiUser } from "react-icons/fi";
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import axios from "../api/axios";
-import { jwtDecode } from "jwt-decode";
 import md5 from 'crypto-js/md5';
 
 export default function Login() {
@@ -39,17 +38,12 @@ export default function Login() {
         })
             .then((res) => {
                 Cookies.set("userId", res.data.accountId);
-                // dispatch(setuserId(res.data.accountId))
-                Cookies.set("accessToken-khanh", res.data.accessToken);
-                const decoded = jwtDecode(res.data.accessToken);
-                console.log("decoded", decoded);
-
-                Cookies.set("refreshToken-khanh", res.data.refreshToken);
+                Cookies.set("accessToken-bach", res.data.accessToken);
+                Cookies.set("refreshToken-bach", res.data.refreshToken);
                 toast("Login Successful")
                 return navigate("/")
             })
             .catch(err => {
-                // console.log(err.response.data.message);
                 toast.error(<p className=" capitalize">{err.response.data.message}</p>)
 
 

@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "../api/axios";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-// import { useSelector } from "react-redux";
-// import { RootState } from "../store";
 interface UserData {
     id: string;
     username: string;
@@ -17,11 +15,17 @@ interface UserData {
     role: string
 }
 export default function Content() {
-    const [data, setData] = useState<UserData | undefined>()
-    const accessTokenFood = Cookies.get("accessToken-khanh");
-    const refreshTokenFood = Cookies.get("refreshToken-khanh");
+    const [data, setData] = useState<UserData | undefined>();
+    const [accessTokenFood, setAccessTokenFood] = useState<string | undefined>(
+        Cookies.get("accessToken-bach")
+    );
+    const [refreshTokenFood, setRefreshTokenFood] = useState<string | undefined>(
+        Cookies.get("refreshToken-bach")
+    );
     const userId = Cookies.get("userId");
-    // const userId: number | undefined = useSelector((state: RootState) => state.forms.userId);
+
+    console.log(setRefreshTokenFood);
+
     const refreshAccessToken = async () => {
         try {
             const res = await axios.post("/api/v1/auth/regenerate-token",
@@ -30,23 +34,20 @@ export default function Content() {
                     "refreshToken": refreshTokenFood,
 
                 });
-            console.log("res refresh", res);
-
-            Cookies.set("accessToken-khanh", res.data.accessToken);
-            Cookies.set("refreshToken-khanh", res.data.refreshToken);
-            await fetchData();
+            Cookies.set("accessToken-bach", res.data.accessToken);
+            Cookies.set("refreshToken-bach", res.data.refreshToken);
+            setAccessTokenFood(res.data.accessToken);
+            setRefreshTokenFood(res.data.refreshToken);
         } catch (error: any) {
             toast(error.response.data.message);
-            Cookies.remove('accessTokenFood')
-            Cookies.remove('refreshTokenFood')
+            Cookies.remove('accessToken-bach')
+            Cookies.remove('refreshToken-bach')
             Cookies.remove('userId')
         }
     };
     const fetchData = async () => {
         try {
-            // if (!accessTokenFood && !userId) {
-            //     return;
-            // }
+
             const res = await axios.get(`/api/v1/user/profile/${userId} `, {
                 headers: {
                     Authorization: `Bearer ${accessTokenFood}`,
@@ -54,37 +55,35 @@ export default function Content() {
             },);
             setData(res.data);
         } catch (error: any) {
-            // console.log("error fetchData ", error);
-
-            if (error.response && error.response.status === 401) {
+            if (refreshTokenFood && error.response && error.response.status === 401) {
                 await refreshAccessToken();
             } else {
                 console.log("err fetchData not 401", error.response.data);
             }
         }
     };
-    const memoizedFetchData = useCallback(fetchData, [accessTokenFood]);
+
     useEffect(() => {
-        memoizedFetchData();
-    }, [memoizedFetchData, accessTokenFood]);
+        const fetchDataWithRetry = async () => {
+            try {
+                await fetchData();
+            } catch (error) {
+                console.log("Error in useEffect:", error);
+            }
+        };
+
+        if (accessTokenFood) {
+            fetchDataWithRetry();
+        } else {
+            console.log("Not logged in");
+        }
+    }, [accessTokenFood]);
 
     const handleLogout = async () => {
-        try {
-            await axios.get("/api/logout", {
-                headers: {
-                    Authorization: `Bearer ${accessTokenFood}`,
-                },
-            });
-            Cookies.remove('accessTokenFood')
-            Cookies.remove('refreshTokenFood')
-            Cookies.remove('userId')
-            setData(undefined)
-
-        } catch (error) {
-            toast("Logout error !")
-            console.log("err handleLogout", error);
-        }
-
+        Cookies.remove('accessToken-khanh')
+        Cookies.remove('refreshTokenFood')
+        Cookies.remove('userId')
+        setData(undefined)
     };
 
 
@@ -102,7 +101,8 @@ export default function Content() {
                 {data.gender && <div className=" space-x-4"><span className="font-bold">Gender: </span> <span className=" capitalize">{data.gender}</span></div>}
                 {data.dob && <div className=" space-x-4"><span className="font-bold">Date of birth : </span> <span>{data.dob}</span></div>}
             </div>
-            <button onClick={handleLogout} className="p-4 bg-third text-white rounded-xl  m-10 h-fit md:w-fit  text-base md:text-xl">LogOut</button>
+            <button onClick={handleLogout} className="p-4 bg-third text-white rounded-xl  mx-10 mt-4 h-fit md:w-fit  text-base md:text-xl">LogOut</button>
+            <Link to="/change-password" className="p-4 bg-third text-white rounded-xl  mx-10 mt-4 h-fit md:w-fit  text-base md:text-xl text-center"><button className="">Change Password</button></Link>
         </div> :
             <Link to="/login">
                 <div className="flex justify-between">

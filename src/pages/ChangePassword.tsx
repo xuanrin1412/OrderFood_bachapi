@@ -10,9 +10,10 @@ import { useState } from "react";
 // import { FiUser } from "react-icons/fi";
 import { toast } from 'react-toastify';
 // import { IoCode } from "react-icons/io5";
-// import Cookies from 'js-cookie';
+import Cookies from 'js-cookie';
 import axios from "../api/axios";
 import { HiOutlineMail } from "react-icons/hi";
+import md5 from 'crypto-js/md5';
 
 
 export default function ChangePassword() {
@@ -31,20 +32,30 @@ export default function ChangePassword() {
     const [oldPassword, setOldPassword] = useState<string>("")
     const [newPassword, setNewPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
+    const [accessTokenFood, setAccessTokenFood] = useState<string | undefined>(
+        Cookies.get("accessToken-bach")
+    );
+    console.log(setAccessTokenFood);
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault()
-        console.log(email, oldPassword, newPassword, confirmPassword);
+        const hashedPassword = md5(oldPassword).toString();
+
         await axios.put("/api/v1/auth/change-password", {
-            email, oldPassword, newPassword, confirmPassword
-        })
+            email, oldPassword: hashedPassword, newPassword, confirmPassword
+        },
+            {
+                headers: {
+                    Authorization: `bearer ${accessTokenFood}`,
+                },
+            }
+        )
             .then((res) => {
                 console.log("res change pass", res);
                 toast("Login Successful")
                 return navigate("/")
             })
             .catch(err => {
-                console.log(err.response.data.message);
                 toast.error(<p className=" capitalize">{err.response.data.message}</p>)
             })
     }
@@ -66,7 +77,7 @@ export default function ChangePassword() {
                 </div>
                 <form onSubmit={handleSubmit} className="mx-auto md:mx-0  max-w-[400px] md:max-w-[400px] lg:max-w-[28.125rem] xl:max-w-[33.75rem] mt-12 flex flex-col gap-8">
                     <div className=" flex flex-col gap-3">
-                        <div className=" font-bold text-2xl leading-9 text-[#292C38] dark:text-white">Login with new Password</div>
+                        <div className=" font-bold text-2xl leading-9 text-[#292C38] dark:text-white">Change Your Password</div>
                         {/* <div className="text-sm font-medium text-textsecondary dark:text-textMain">Log In to your account</div> */}
                     </div>
                     <div className="flex flex-col gap-4">
@@ -108,16 +119,8 @@ export default function ChangePassword() {
                             <input type="checkbox" />
                             <span className="checkbox-container  bg-white dark:bg-transparent   dark:border-[#565C70]"></span>
                         </label>
-                        {/* <span className=" text-third font-bold text-base"><Link to="/forgot-password">Forgot Password?</Link></span> */}
                     </div>
-                    <button type="submit" className="h-58  bg-third text-base leading-nomalText tracking-nomalText font-medium rounded-xl text-white ">Log In</button>
-                    {/* <div className="divider dark:before:bg-[#565C70] dark:after:bg-[#565C70] ">
-                        <div className="divider-content text-textsecondary dark:text-[#565C70]  font-medium text-sm px-4">Or log in with</div>
-                    </div>
-                    <button className=" h-58  rounded-xl border border-borderColor dark:border-textMain flex gap-3 justify-center items-center">
-                        <FcGoogle style={{ width: 24, height: 24 }} />
-                        <span className=" font-medium text-base leading-nomalText tracking-nomalText text-[#292C38] dark:text-white">Log In with Google</span>
-                    </button> */}
+                    <button type="submit" className="h-58  bg-third text-base leading-nomalText tracking-nomalText font-medium rounded-xl text-white ">Confirm</button>
                 </form>
                 <div className=" md:max-w-[400px] lg:max-w-[28.125rem] xl:max-w-[33.75rem] pt-[8.313rem] pb-12 flex justify-center">
                     <span className="font-medium text-base leading-normalText tracking-normalText text-textsecondary dark:text-[#94A3B8]">Don't have an account?</span>&nbsp;
